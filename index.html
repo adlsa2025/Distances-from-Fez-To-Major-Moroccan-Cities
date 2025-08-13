@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distances from Fez - Table View</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .blog-credit {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .region-banner {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tbody tr:hover {
+            background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+            transform: scale(1.01);
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tbody tr:nth-child(even):hover {
+            background: linear-gradient(90deg, #e9ecef, #dee2e6);
+        }
+        
+        td {
+            padding: 15px;
+            font-size: 1rem;
+            border-right: 1px solid #ecf0f1;
+        }
+        
+        td:last-child {
+            border-right: none;
+        }
+        
+        .city-cell {
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .city-icon {
+            font-size: 1.3rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .distance-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .direct-distance {
+            color: #27ae60;
+        }
+        
+        .road-distance {
+            color: #e74c3c;
+        }
+        
+        .difference-cell {
+            text-align: center;
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        
+        .footer-info {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .footer-info p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .distance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            margin-left: 8px;
+        }
+        
+        .nearby { background: #27ae60; }
+        .medium { background: #f39c12; }
+        .far { background: #e74c3c; }
+        .very-far { background: #8e44ad; }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .city-cell {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+            
+            .city-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Distances from Fez</h1>
+            <p>Major Moroccan Cities</p>
+            <p class="blog-credit">maghrebista.com</p>
+        </div>
+        
+        <div class="region-banner">
+            Fez-Meknes Region • 40,075 km² • 5.7% of national territory • Established 2015
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🏙️ Destination City</th>
+                        <th>📏 Direct Distance</th>
+                        <th>🛣️ Road Distance</th>
+                        <th>📊 Difference</th>
+                    </tr>
+                </thead>
+                <tbody id="cityTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer-info">
+            <p><strong>Note:</strong> Direct distances correspond to straight-line measurements</p>
+            <p><strong>Source:</strong> Geographic data compiled for maghrebista.com</p>
+            <p><strong>Fez-Meknes Region:</strong> Borders 5 Moroccan regions</p>
+        </div>
+    </div>
+
+    <script>
+        const cities = [
+            { name: "Meknes", direct: 52.78, road: 68.36, icon: "🏰" },
+            { name: "Ifrane", direct: 81.17, road: 96.49, icon: "🏔️" },
+            { name: "Chefchaouen", direct: 128.56, road: 195.01, icon: "💙" },
+            { name: "Rabat", direct: 168.87, road: 202.98, icon: "🏛️" },
+            { name: "Tetouan", direct: 175.09, road: 253.77, icon: "🌊" },
+            { name: "Tangier", direct: 206.15, road: 403.58, icon: "⚓" },
+            { name: "Casablanca", direct: 246.25, road: 298.56, icon: "🏢" },
+            { name: "Oujda", direct: 291.41, road: 327.07, icon: "🌅" },
+            { name: "Marrakech", direct: 386.88, road: 533.69, icon: "🕌" },
+            { name: "Essaouira", direct: 526.61, road: 658.38, icon: "🎣" },
+            { name: "Agadir", direct: 562.41, road: 732.46, icon: "🏖️" },
+            { name: "Laayoune", direct: 1094.57, road: 1508.95, icon: "🏜️" },
+            { name: "Dakhla", direct: 1564.14, road: 2041.69, icon: "🐪" }
+        ];
+        
+        function getDistanceCategory(distance) {
+            if (distance < 100) return 'nearby';
+            if (distance < 300) return 'medium';
+            if (distance < 600) return 'far';
+            return 'very-far';
+        }
+        
+        function getCategoryLabel(category) {
+            const labels = {
+                'nearby': 'Nearby',
+                'medium': 'Medium',
+                'far': 'Far',
+                'very-far': 'Very Far'
+            };
+            return labels[category];
+        }
+        
+        function createTableRow(city) {
+            const difference = city.road - city.direct;
+            const category = getDistanceCategory(city.direct);
+            const categoryLabel = getCategoryLabel(category);
+            
+            return `
+                <tr>
+                    <td class="city-cell">
+                        <div class="city-icon">${city.icon}</div>
+                        <span>${city.name}</span>
+                        <span class="distance-badge ${category}">${categoryLabel}</span>
+                    </td>
+                    <td class="distance-cell direct-distance">${city.direct} km</td>
+                    <td class="distance-cell road-distance">${city.road} km</td>
+                    <td class="difference-cell">+${difference.toFixed(1)} km</td>
+                </tr>
+            `;
+        }
+        
+        // Populate the table
+        const tableBody = document.getElementById('cityTableBody');
+        cities.forEach(city => {
+            tableBody.innerHTML += createTableRow(city);
+        });
+        
+        // Add hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</body>
+</html>
