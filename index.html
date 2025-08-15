@@ -1,7 +1,9 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 
-const FezDistanceBarChart = () => {
+const FezDistanceChart = () => {
+  const [chartType, setChartType] = useState('bar');
+  
   const data = [
     { city: 'Meknes', direct: 52.78, road: 68.36 },
     { city: 'Ifrane', direct: 81.17, road: 96.49 },
@@ -18,99 +20,188 @@ const FezDistanceBarChart = () => {
     { city: 'Dakhla', direct: 1564.14, road: 2041.69 }
   ];
 
+  const scatterData = data.map(item => ({
+    ...item,
+    difference: item.road - item.direct,
+    ratio: (item.road / item.direct).toFixed(2)
+  }));
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
         <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800 mb-2">{`🏙️ ${label}`}</p>
-          <p className="text-blue-600">{`📏 Direct Distance: ${data.direct} km`}</p>
-          <p className="text-green-600">{`🛣️ Road Distance: ${data.road} km`}</p>
+          <p className="font-semibold text-gray-800">{`🏙️ ${label}`}</p>
+          <p className="text-blue-600">{`📏 Direct: ${data.direct} km`}</p>
+          <p className="text-green-600">{`🛣️ Road: ${data.road} km`}</p>
           <p className="text-orange-600">{`📊 Difference: ${(data.road - data.direct).toFixed(1)} km`}</p>
-          <p className="text-purple-600">{`📈 Road/Direct Ratio: ${(data.road / data.direct).toFixed(2)}x`}</p>
+          <p className="text-purple-600">{`📈 Ratio: ${(data.road / data.direct).toFixed(2)}x`}</p>
         </div>
       );
     }
     return null;
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg">
-      <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">🗺️ Distances from Fez, Morocco</h2>
-        <p className="text-gray-600">Direct vs Road distances to major Moroccan cities</p>
-      </div>
-      
-      <div className="bg-white rounded-lg p-4 shadow-inner" style={{ height: '600px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  const renderChart = () => {
+    switch (chartType) {
+      case 'bar':
+        return (
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="city" 
               angle={-45} 
               textAnchor="end" 
               height={100}
               fontSize={12}
-              stroke="#6b7280"
+            />
+            <YAxis label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <Bar dataKey="direct" fill="#3b82f6" name="Direct Distance" />
+            <Bar dataKey="road" fill="#10b981" name="Road Distance" />
+          </BarChart>
+        );
+      
+      case 'line':
+        return (
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="city" 
+              angle={-45} 
+              textAnchor="end" 
+              height={100}
+              fontSize={12}
+            />
+            <YAxis label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
+            <Line type="monotone" dataKey="direct" stroke="#3b82f6" strokeWidth={3} dot={{ r: 5 }} name="Direct Distance" />
+            <Line type="monotone" dataKey="road" stroke="#10b981" strokeWidth={3} dot={{ r: 5 }} name="Road Distance" />
+          </LineChart>
+        );
+      
+      case 'scatter':
+        return (
+          <ScatterChart data={scatterData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="direct" 
+              name="Direct Distance" 
+              label={{ value: 'Direct Distance (km)', position: 'insideBottom', offset: -5 }}
             />
             <YAxis 
-              label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }}
-              stroke="#6b7280"
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend 
-              wrapperStyle={{ paddingTop: '20px' }}
-            />
-            <Bar 
-              dataKey="direct" 
-              fill="#3b82f6" 
-              name="📏 Direct Distance"
-              radius={[2, 2, 0, 0]}
-            />
-            <Bar 
               dataKey="road" 
-              fill="#10b981" 
-              name="🛣️ Road Distance"
-              radius={[2, 2, 0, 0]}
+              name="Road Distance"
+              label={{ value: 'Road Distance (km)', angle: -90, position: 'insideLeft' }}
             />
-          </BarChart>
+            <Tooltip 
+              cursor={{ strokeDasharray: '3 3' }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-lg">
+                      <p className="font-semibold">{data.city}</p>
+                      <p>Direct: {data.direct} km</p>
+                      <p>Road: {data.road} km</p>
+                      <p>Ratio: {data.ratio}x</p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Scatter dataKey="road" fill="#8b5cf6" />
+          </ScatterChart>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg">
+      <div className="text-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">🗺️ Distances from Fez, Morocco</h2>
+        <p className="text-gray-600">Interactive comparison of direct vs road distances to major Moroccan cities</p>
+      </div>
+      
+      <div className="flex flex-wrap justify-center gap-2 mb-6">
+        <button
+          onClick={() => setChartType('bar')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            chartType === 'bar' 
+              ? 'bg-blue-600 text-white shadow-md' 
+              : 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-300'
+          }`}
+        >
+          📊 Bar Chart
+        </button>
+        <button
+          onClick={() => setChartType('line')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            chartType === 'line' 
+              ? 'bg-green-600 text-white shadow-md' 
+              : 'bg-white text-gray-700 hover:bg-green-50 border border-gray-300'
+          }`}
+        >
+          📈 Line Chart
+        </button>
+        <button
+          onClick={() => setChartType('scatter')}
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            chartType === 'scatter' 
+              ? 'bg-purple-600 text-white shadow-md' 
+              : 'bg-white text-gray-700 hover:bg-purple-50 border border-gray-300'
+          }`}
+        >
+          🔵 Scatter Plot
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg p-4 shadow-inner" style={{ height: '500px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          {renderChart()}
         </ResponsiveContainer>
       </div>
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h3 className="font-semibold text-blue-600 mb-2">📏 Closest Cities</h3>
-          <ul className="space-y-1 text-gray-700">
-            <li>🥇 Meknes: 53 km direct</li>
-            <li>🥈 Ifrane: 81 km direct</li>
-            <li>🥉 Chefchaouen: 129 km direct</li>
+          <ul className="space-y-1">
+            <li>🥇 Meknes: 53 km</li>
+            <li>🥈 Ifrane: 81 km</li>
+            <li>🥉 Chefchaouen: 129 km</li>
           </ul>
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="font-semibold text-green-600 mb-2">🛣️ Biggest Detours</h3>
-          <ul className="space-y-1 text-gray-700">
-            <li>🥇 Tangier: +197 km via road</li>
-            <li>🥈 Laayoune: +414 km via road</li>
-            <li>🥉 Dakhla: +478 km via road</li>
+          <h3 className="font-semibold text-green-600 mb-2">🛣️ Biggest Road Detours</h3>
+          <ul className="space-y-1">
+            <li>🥇 Tangier: 1.96x longer</li>
+            <li>🥈 Chefchaouen: 1.52x longer</li>
+            <li>🥉 Tetouan: 1.45x longer</li>
           </ul>
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h3 className="font-semibold text-purple-600 mb-2">🌍 Furthest Cities</h3>
-          <ul className="space-y-1 text-gray-700">
-            <li>🥇 Dakhla: 2,042 km by road</li>
-            <li>🥈 Laayoune: 1,509 km by road</li>
-            <li>🥉 Agadir: 732 km by road</li>
+          <ul className="space-y-1">
+            <li>🥇 Dakhla: 1,564 km</li>
+            <li>🥈 Laayoune: 1,095 km</li>
+            <li>🥉 Agadir: 562 km</li>
           </ul>
         </div>
       </div>
 
       <div className="mt-4 text-center text-gray-600 text-sm">
-        💡 Blue bars show direct distances, green bars show actual driving distances
+        💡 Tip: Try different chart types to explore the data! The scatter plot shows the relationship between direct and road distances.
       </div>
     </div>
   );
 };
 
-export default FezDistanceBarChart;
+export default FezDistanceChart;
