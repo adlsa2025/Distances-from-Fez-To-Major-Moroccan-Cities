@@ -1,207 +1,324 @@
-import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, ScatterChart, Scatter } from 'recharts';
-
-const FezDistanceChart = () => {
-  const [chartType, setChartType] = useState('bar');
-  
-  const data = [
-    { city: 'Meknes', direct: 52.78, road: 68.36 },
-    { city: 'Ifrane', direct: 81.17, road: 96.49 },
-    { city: 'Chefchaouen', direct: 128.56, road: 195.01 },
-    { city: 'Rabat', direct: 168.87, road: 202.98 },
-    { city: 'Tetouan', direct: 175.09, road: 253.77 },
-    { city: 'Tangier', direct: 206.15, road: 403.58 },
-    { city: 'Casablanca', direct: 246.25, road: 298.56 },
-    { city: 'Oujda', direct: 291.41, road: 327.07 },
-    { city: 'Marrakech', direct: 386.88, road: 533.69 },
-    { city: 'Essaouira', direct: 526.61, road: 658.38 },
-    { city: 'Agadir', direct: 562.41, road: 732.46 },
-    { city: 'Laayoune', direct: 1094.57, road: 1508.95 },
-    { city: 'Dakhla', direct: 1564.14, road: 2041.69 }
-  ];
-
-  const scatterData = data.map(item => ({
-    ...item,
-    difference: item.road - item.direct,
-    ratio: (item.road / item.direct).toFixed(2)
-  }));
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800">{`🏙️ ${label}`}</p>
-          <p className="text-blue-600">{`📏 Direct: ${data.direct} km`}</p>
-          <p className="text-green-600">{`🛣️ Road: ${data.road} km`}</p>
-          <p className="text-orange-600">{`📊 Difference: ${(data.road - data.direct).toFixed(1)} km`}</p>
-          <p className="text-purple-600">{`📈 Ratio: ${(data.road / data.direct).toFixed(2)}x`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const renderChart = () => {
-    switch (chartType) {
-      case 'bar':
-        return (
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="city" 
-              angle={-45} 
-              textAnchor="end" 
-              height={100}
-              fontSize={12}
-            />
-            <YAxis label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Bar dataKey="direct" fill="#3b82f6" name="Direct Distance" />
-            <Bar dataKey="road" fill="#10b981" name="Road Distance" />
-          </BarChart>
-        );
-      
-      case 'line':
-        return (
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="city" 
-              angle={-45} 
-              textAnchor="end" 
-              height={100}
-              fontSize={12}
-            />
-            <YAxis label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Line type="monotone" dataKey="direct" stroke="#3b82f6" strokeWidth={3} dot={{ r: 5 }} name="Direct Distance" />
-            <Line type="monotone" dataKey="road" stroke="#10b981" strokeWidth={3} dot={{ r: 5 }} name="Road Distance" />
-          </LineChart>
-        );
-      
-      case 'scatter':
-        return (
-          <ScatterChart data={scatterData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="direct" 
-              name="Direct Distance" 
-              label={{ value: 'Direct Distance (km)', position: 'insideBottom', offset: -5 }}
-            />
-            <YAxis 
-              dataKey="road" 
-              name="Road Distance"
-              label={{ value: 'Road Distance (km)', angle: -90, position: 'insideLeft' }}
-            />
-            <Tooltip 
-              cursor={{ strokeDasharray: '3 3' }}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-lg">
-                      <p className="font-semibold">{data.city}</p>
-                      <p>Direct: {data.direct} km</p>
-                      <p>Road: {data.road} km</p>
-                      <p>Ratio: {data.ratio}x</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Scatter dataKey="road" fill="#8b5cf6" />
-          </ScatterChart>
-        );
-      
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg">
-      <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">🗺️ Distances from Fez, Morocco</h2>
-        <p className="text-gray-600">Interactive comparison of direct vs road distances to major Moroccan cities</p>
-      </div>
-      
-      <div className="flex flex-wrap justify-center gap-2 mb-6">
-        <button
-          onClick={() => setChartType('bar')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
-            chartType === 'bar' 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-300'
-          }`}
-        >
-          📊 Bar Chart
-        </button>
-        <button
-          onClick={() => setChartType('line')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
-            chartType === 'line' 
-              ? 'bg-green-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-green-50 border border-gray-300'
-          }`}
-        >
-          📈 Line Chart
-        </button>
-        <button
-          onClick={() => setChartType('scatter')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
-            chartType === 'scatter' 
-              ? 'bg-purple-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-purple-50 border border-gray-300'
-          }`}
-        >
-          🔵 Scatter Plot
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg p-4 shadow-inner" style={{ height: '500px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          {renderChart()}
-        </ResponsiveContainer>
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="font-semibold text-blue-600 mb-2">📏 Closest Cities</h3>
-          <ul className="space-y-1">
-            <li>🥇 Meknes: 53 km</li>
-            <li>🥈 Ifrane: 81 km</li>
-            <li>🥉 Chefchaouen: 129 km</li>
-          </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distances from Fez - Table View</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .blog-credit {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .region-banner {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        tbody tr:hover {
+            background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+            transform: scale(1.01);
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tbody tr:nth-child(even):hover {
+            background: linear-gradient(90deg, #e9ecef, #dee2e6);
+        }
+        
+        td {
+            padding: 15px;
+            font-size: 1rem;
+            border-right: 1px solid #ecf0f1;
+        }
+        
+        td:last-child {
+            border-right: none;
+        }
+        
+        .city-cell {
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .city-icon {
+            font-size: 1.3rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .distance-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .direct-distance {
+            color: #27ae60;
+        }
+        
+        .road-distance {
+            color: #e74c3c;
+        }
+        
+        .difference-cell {
+            text-align: center;
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        
+        .footer-info {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .footer-info p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        
+        .distance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            margin-left: 8px;
+        }
+        
+        .nearby { background: #27ae60; }
+        .medium { background: #f39c12; }
+        .far { background: #e74c3c; }
+        .very-far { background: #8e44ad; }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .table-container {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .city-cell {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+            
+            .city-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Distances depuis Fez</h1>
+            <p>Villes principales du Maroc</p>
+            <p class="blog-credit">maghrebista.com</p>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="font-semibold text-green-600 mb-2">🛣️ Biggest Road Detours</h3>
-          <ul className="space-y-1">
-            <li>🥇 Tangier: 1.96x longer</li>
-            <li>🥈 Chefchaouen: 1.52x longer</li>
-            <li>🥉 Tetouan: 1.45x longer</li>
-          </ul>
+        <div class="region-banner">
+            Région Fès-Meknès • 40,075 km² • 5,7% du territoire national • Créée en 2015
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="font-semibold text-purple-600 mb-2">🌍 Furthest Cities</h3>
-          <ul className="space-y-1">
-            <li>🥇 Dakhla: 1,564 km</li>
-            <li>🥈 Laayoune: 1,095 km</li>
-            <li>🥉 Agadir: 562 km</li>
-          </ul>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>🏙️ Ville de Destination</th>
+                        <th>📏 Distance Directe</th>
+                        <th>🛣️ Distance Routière</th>
+                        <th>📊 Différence</th>
+                    </tr>
+                </thead>
+                <tbody id="cityTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
         </div>
-      </div>
-
-      <div className="mt-4 text-center text-gray-600 text-sm">
-        💡 Tip: Try different chart types to explore the data! The scatter plot shows the relationship between direct and road distances.
-      </div>
+        
+        <div class="footer-info">
+            <p><strong>Note:</strong> Les distances directes correspondent aux mesures à vol d'oiseau</p>
+            <p><strong>Source:</strong> Données géographiques compilées pour maghrebista.com</p>
+            <p><strong>Région Fès-Meknès:</strong> Limitrophe de 5 régions marocaines</p>
+        </div>
     </div>
-  );
-};
 
-export default FezDistanceChart;
+    <script>
+        const cities = [
+            { name: "Meknès", direct: 52.78, road: 68.36, icon: "🏰" },
+            { name: "Ifrane", direct: 81.17, road: 96.49, icon: "🏔️" },
+            { name: "Chefchaouen", direct: 128.56, road: 195.01, icon: "💙" },
+            { name: "Rabat", direct: 168.87, road: 202.98, icon: "🏛️" },
+            { name: "Tétouan", direct: 175.09, road: 253.77, icon: "🌊" },
+            { name: "Tanger", direct: 206.15, road: 403.58, icon: "⚓" },
+            { name: "Casablanca", direct: 246.25, road: 298.56, icon: "🏢" },
+            { name: "Oujda", direct: 291.41, road: 327.07, icon: "🌅" },
+            { name: "Marrakech", direct: 386.88, road: 533.69, icon: "🕌" },
+            { name: "Essaouira", direct: 526.61, road: 658.38, icon: "🎣" },
+            { name: "Agadir", direct: 562.41, road: 732.46, icon: "🏖️" },
+            { name: "Laâyoune", direct: 1094.57, road: 1508.95, icon: "🏜️" },
+            { name: "Dakhla", direct: 1564.14, road: 2041.69, icon: "🐪" }
+        ];
+        
+        function getDistanceCategory(distance) {
+            if (distance < 100) return 'nearby';
+            if (distance < 300) return 'medium';
+            if (distance < 600) return 'far';
+            return 'very-far';
+        }
+        
+        function getCategoryLabel(category) {
+            const labels = {
+                'nearby': 'Proche',
+                'medium': 'Moyenne',
+                'far': 'Loin',
+                'very-far': 'Très loin'
+            };
+            return labels[category];
+        }
+        
+        function createTableRow(city) {
+            const difference = city.road - city.direct;
+            const category = getDistanceCategory(city.direct);
+            const categoryLabel = getCategoryLabel(category);
+            
+            return `
+                <tr>
+                    <td class="city-cell">
+                        <div class="city-icon">${city.icon}</div>
+                        <span>${city.name}</span>
+                        <span class="distance-badge ${category}">${categoryLabel}</span>
+                    </td>
+                    <td class="distance-cell direct-distance">${city.direct} km</td>
+                    <td class="distance-cell road-distance">${city.road} km</td>
+                    <td class="difference-cell">+${difference.toFixed(1)} km</td>
+                </tr>
+            `;
+        }
+        
+        // Populate the table
+        const tableBody = document.getElementById('cityTableBody');
+        cities.forEach(city => {
+            tableBody.innerHTML += createTableRow(city);
+        });
+        
+        // Add hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</body>
+</html>
