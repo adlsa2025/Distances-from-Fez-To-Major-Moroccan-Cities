@@ -1,86 +1,116 @@
-<!-- Fez Climate Chart (Chart.js, single file, Blogger-friendly) -->
-<div style="max-width:900px;margin:24px auto;padding:16px;border:1px solid #eee;border-radius:12px;">
-  <h3 style="margin:0 0 10px;">City of Fez – Climate Overview</h3>
-  <p style="margin:0 0 12px;font-size:14px;line-height:1.5;">
-    Avg Temperature (°C) and Rainfall (mm) – approximate monthly values derived from your description.
-  </p>
+import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-  <canvas id="fezClimateChart" style="width:100%;height:420px;"></canvas>
+const FezDistanceBarChart = () => {
+  const data = [
+    { city: 'Meknes', direct: 52.78, road: 68.36 },
+    { city: 'Ifrane', direct: 81.17, road: 96.49 },
+    { city: 'Chefchaouen', direct: 128.56, road: 195.01 },
+    { city: 'Rabat', direct: 168.87, road: 202.98 },
+    { city: 'Tetouan', direct: 175.09, road: 253.77 },
+    { city: 'Tangier', direct: 206.15, road: 403.58 },
+    { city: 'Casablanca', direct: 246.25, road: 298.56 },
+    { city: 'Oujda', direct: 291.41, road: 327.07 },
+    { city: 'Marrakech', direct: 386.88, road: 533.69 },
+    { city: 'Essaouira', direct: 526.61, road: 658.38 },
+    { city: 'Agadir', direct: 562.41, road: 732.46 },
+    { city: 'Laayoune', direct: 1094.57, road: 1508.95 },
+    { city: 'Dakhla', direct: 1564.14, road: 2041.69 }
+  ];
 
-  <small style="display:block;margin-top:10px;color:#666;">
-    Notes: Winters are mild and rainy; summers are hot and very dry. Sunshine ~3,000 hours/year; snow is rare.
-  </small>
-</div>
-
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-//<![CDATA[
-(function () {
-  // Months
-  var labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-  // Approximate monthly averages based on your text
-  // Temp: yearly avg ~17–18°C; winter days ~15°C; spring 14→19; summer peaks 26–27; autumn mid-20s→~19–20
-  var avgTempC = [11, 13, 14, 16, 19, 23, 27, 27, 24, 20, 15, 12];
-
-  // Rain: concentrated Nov–Mar (peak ~60–72mm), May ~38mm, Oct–Nov ~45–65mm, summer ~0
-  var rainMM   = [60, 65, 72, 45, 38, 10, 2, 3, 12, 55, 65, 60];
-
-  // Create chart
-  var ctx = document.getElementById("fezClimateChart").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          type: "bar",
-          label: "Rainfall (mm)",
-          data: rainMM,
-          yAxisID: "yRain"
-        },
-        {
-          type: "line",
-          label: "Avg Temp (°C)",
-          data: avgTempC,
-          yAxisID: "yTemp",
-          tension: 0.3,
-          pointRadius: 3
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "top" },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              var unit = ctx.dataset.yAxisID === "yTemp" ? "°C" : " mm";
-              return ctx.dataset.label + ": " + ctx.parsed.y + unit;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false } },
-        yRain: {
-          position: "left",
-          title: { display: true, text: "Rainfall (mm)" },
-          suggestedMin: 0, suggestedMax: 80
-        },
-        yTemp: {
-          position: "right",
-          title: { display: true, text: "Avg Temp (°C)" },
-          suggestedMin: 0, suggestedMax: 35,
-          grid: { drawOnChartArea: false }
-        }
-      }
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-4 border border-gray-300 rounded-lg shadow-lg">
+          <p className="font-semibold text-gray-800 mb-2">{`🏙️ ${label}`}</p>
+          <p className="text-blue-600">{`📏 Direct Distance: ${data.direct} km`}</p>
+          <p className="text-green-600">{`🛣️ Road Distance: ${data.road} km`}</p>
+          <p className="text-orange-600">{`📊 Difference: ${(data.road - data.direct).toFixed(1)} km`}</p>
+          <p className="text-purple-600">{`📈 Road/Direct Ratio: ${(data.road / data.direct).toFixed(2)}x`}</p>
+        </div>
+      );
     }
-  });
-})();
-//]]>
-</script>
+    return null;
+  };
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg">
+      <div className="text-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">🗺️ Distances from Fez, Morocco</h2>
+        <p className="text-gray-600">Direct vs Road distances to major Moroccan cities</p>
+      </div>
+      
+      <div className="bg-white rounded-lg p-4 shadow-inner" style={{ height: '600px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis 
+              dataKey="city" 
+              angle={-45} 
+              textAnchor="end" 
+              height={100}
+              fontSize={12}
+              stroke="#6b7280"
+            />
+            <YAxis 
+              label={{ value: 'Distance (km)', angle: -90, position: 'insideLeft' }}
+              stroke="#6b7280"
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              wrapperStyle={{ paddingTop: '20px' }}
+            />
+            <Bar 
+              dataKey="direct" 
+              fill="#3b82f6" 
+              name="📏 Direct Distance"
+              radius={[2, 2, 0, 0]}
+            />
+            <Bar 
+              dataKey="road" 
+              fill="#10b981" 
+              name="🛣️ Road Distance"
+              radius={[2, 2, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h3 className="font-semibold text-blue-600 mb-2">📏 Closest Cities</h3>
+          <ul className="space-y-1 text-gray-700">
+            <li>🥇 Meknes: 53 km direct</li>
+            <li>🥈 Ifrane: 81 km direct</li>
+            <li>🥉 Chefchaouen: 129 km direct</li>
+          </ul>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h3 className="font-semibold text-green-600 mb-2">🛣️ Biggest Detours</h3>
+          <ul className="space-y-1 text-gray-700">
+            <li>🥇 Tangier: +197 km via road</li>
+            <li>🥈 Laayoune: +414 km via road</li>
+            <li>🥉 Dakhla: +478 km via road</li>
+          </ul>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h3 className="font-semibold text-purple-600 mb-2">🌍 Furthest Cities</h3>
+          <ul className="space-y-1 text-gray-700">
+            <li>🥇 Dakhla: 2,042 km by road</li>
+            <li>🥈 Laayoune: 1,509 km by road</li>
+            <li>🥉 Agadir: 732 km by road</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-4 text-center text-gray-600 text-sm">
+        💡 Blue bars show direct distances, green bars show actual driving distances
+      </div>
+    </div>
+  );
+};
+
+export default FezDistanceBarChart;
