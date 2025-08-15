@@ -215,23 +215,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🗺️ Distances depuis Fez</h1>
-            <p>Villes principales du Maroc</p>
+            <h1>🗺️ Distances from Fez</h1>
+            <p>Major Moroccan Cities</p>
             <p class="blog-credit">maghrebista.com</p>
         </div>
         
         <div class="region-banner">
-            Région Fès-Meknès • 40,075 km² • 5,7% du territoire national • Créée en 2015
+            Fez-Meknes Region • 40,075 km² • 5.7% of national territory • Established 2015
         </div>
         
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>🏙️ Ville de Destination</th>
-                        <th>📏 Distance Directe</th>
-                        <th>🛣️ Distance Routière</th>
-                        <th>📊 Différence</th>
+                        <th>🏙️ Destination City</th>
+                        <th>📏 Direct Distance</th>
+                        <th>🛣️ Road Distance</th>
+                        <th>📊 Difference</th>
                     </tr>
                 </thead>
                 <tbody id="cityTableBody">
@@ -241,26 +241,26 @@
         </div>
         
         <div class="footer-info">
-            <p><strong>Note:</strong> Les distances directes correspondent aux mesures à vol d'oiseau</p>
-            <p><strong>Source:</strong> Données géographiques compilées pour maghrebista.com</p>
-            <p><strong>Région Fès-Meknès:</strong> Limitrophe de 5 régions marocaines</p>
+            <p><strong>Note:</strong> Direct distances correspond to straight-line measurements</p>
+            <p><strong>Source:</strong> Geographic data compiled for maghrebista.com</p>
+            <p><strong>Fez-Meknes Region:</strong> Borders 5 Moroccan regions</p>
         </div>
     </div>
 
     <script>
         const cities = [
-            { name: "Meknès", direct: 52.78, road: 68.36, icon: "🏰" },
+            { name: "Meknes", direct: 52.78, road: 68.36, icon: "🏰" },
             { name: "Ifrane", direct: 81.17, road: 96.49, icon: "🏔️" },
             { name: "Chefchaouen", direct: 128.56, road: 195.01, icon: "💙" },
             { name: "Rabat", direct: 168.87, road: 202.98, icon: "🏛️" },
-            { name: "Tétouan", direct: 175.09, road: 253.77, icon: "🌊" },
-            { name: "Tanger", direct: 206.15, road: 403.58, icon: "⚓" },
+            { name: "Tetouan", direct: 175.09, road: 253.77, icon: "🌊" },
+            { name: "Tangier", direct: 206.15, road: 403.58, icon: "⚓" },
             { name: "Casablanca", direct: 246.25, road: 298.56, icon: "🏢" },
             { name: "Oujda", direct: 291.41, road: 327.07, icon: "🌅" },
             { name: "Marrakech", direct: 386.88, road: 533.69, icon: "🕌" },
             { name: "Essaouira", direct: 526.61, road: 658.38, icon: "🎣" },
             { name: "Agadir", direct: 562.41, road: 732.46, icon: "🏖️" },
-            { name: "Laâyoune", direct: 1094.57, road: 1508.95, icon: "🏜️" },
+            { name: "Laayoune", direct: 1094.57, road: 1508.95, icon: "🏜️" },
             { name: "Dakhla", direct: 1564.14, road: 2041.69, icon: "🐪" }
         ];
         
@@ -273,10 +273,10 @@
         
         function getCategoryLabel(category) {
             const labels = {
-                'nearby': 'Proche',
-                'medium': 'Moyenne',
-                'far': 'Loin',
-                'very-far': 'Très loin'
+                'nearby': 'Nearby',
+                'medium': 'Medium',
+                'far': 'Far',
+                'very-far': 'Very Far'
             };
             return labels[category];
         }
